@@ -19,7 +19,7 @@ struct tabu{
 };
 typedef double db;
 typedef vector<db> vd;
-typedef vector<vector<db>> vvd;
+typedef vector<vector<db> > vvd;
 typedef map<db,vd> mvd;
 typedef vector<tabu> vt;
 typedef set<vector<double> > svd;
@@ -32,7 +32,7 @@ void add_to_div_list(vd n, db cost);
 db neighbor_cost(vd n);
 void exchange(int i, int j, vd &n);
 void insertion(int i, int j, db a, vd &n);
-void get_neighbor(int i, int &it);
+void get_neighbor(int i, int &it, int flag);
 void load_costs();
 void read_init_sol();
 void load_demand();
@@ -51,9 +51,10 @@ db best_cost=1<<30;
 int main(){
  
   int best_it=0;
-  int max_it=1000000;
+  int max_it=1;
   int i=0;
-  
+  int flag=1;
+
   read_init_sol();
   cout<<"sol.size: "<<s.size()<<endl;
   load_costs();
@@ -64,12 +65,16 @@ int main(){
   cout<<endl<<"cost: "<<neighbor_cost(s)<<endl;
   //cout<<"get_neighbor"<<endl;
   //get_neighbor(1,best_it);
-  //cout<<endl<<"cost: "<<neighbor_cost(s)<<endl;
-  
-   
+  //cout<<endl<<"cost: "<<neighbor_cost(s)<<endl;   
   while(i++ < max_it){
-    get_neighbor(s,demand,costs,best_cost,best_sol,tabu_list,i,best_it);
-    cout<<"iteration "<<i<<" : ";
+    cout<<"iteration "<<i<<", div_list size: "<<div_list.size()<<endl;
+    if(div_list.size()>0){
+      s = div_list.begin()->second;
+      div_list.erase(div_list.begin());
+    }
+    while(flag){
+      get_neighbor(i,best_it,flag);
+    }
     //print(s);
   }
   /*
@@ -201,12 +206,13 @@ void get_neighbor(int i, int &it){
     best_cost = local_best_cost;
     best_sol = best_neighbor;
     it = i;
+
+    s = best_neighbor;
+    add_tabu_nodes(x,y,pos_x,pos_y);
+    cout<<"cost: "<<local_best_cost<<"nodes: ("<<x<<","<<y<<")("<<pos_x<<","<<pos_y<<")"<<endl;
   }
   //cout<<"best neighbor: "<<endl;
   //print(best_neighbor);
-  cout<<"cost: "<<local_best_cost<<"nodes: ("<<x<<","<<y<<")("<<pos_x<<","<<pos_y<<")"<<endl;
-  s = best_neighbor;
-  add_tabu_nodes(x,y,pos_x,pos_y);
 }
 
 
