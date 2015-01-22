@@ -1,15 +1,16 @@
-#include<bits/stdc++.h>
 /*
- * hacer las etapas de instensificacion terminando cuando no haya una
- * mejor solucion; e implementar la etapa de divesificacion elijiendo 
- * un vecino de la lista de posibles soluciones.
+ * ivanchoff@gmail.com
+ *
  */
+
+#include<bits/stdc++.h>
+
 using namespace std;
 
-#define Q 23000 //capacidad del carro
-#define k 8  //cantidad de carros
-#define tabu_ternure 5  //tabu list size tabu ternure
-#define div_list_size 20 //lenght of diversification list
+#define Q 22000           //capacity of each car
+#define k 8               //number of cars
+#define tabu_ternure 5    //tabu list size - tabu ternure
+#define div_list_size 200 //lenght of diversification list
 
 struct tabu{
   int x;
@@ -23,26 +24,25 @@ typedef vector<vector<db> > vvd;
 typedef map<db,vd> mvd;
 typedef vector<tabu> vt;
 typedef set<vector<double> > svd;
-
 void aspiration();
 int is_tabu_move(int x, int y, int pos_x, int pos_y);
-void print_tabu_list(vt tabu_list);
 void add_tabu_nodes(int x, int y, int pos_x, int posy);
 void add_to_div_list(vd n, db cost);
 db neighbor_cost(vd n);
 void exchange(int i, int j, vd &n);
 void insertion(int i, int j, db a, vd &n);
-void get_neighbor(int i, int &it, int flag);
+void get_neighbor(int i, int &it, int &flag,db &int_best_cost);
 void load_costs();
 void read_init_sol();
 void load_demand();
 void print(vd x);
 void print_matriz(vvd &x);
-
+void print_map(mvd);
+void print_tabu_list(vt tabu_list);
 vd s;
 vt tabu_list;
-mvd div_list; //list for diversification contain the best 20th solution. 
-svd div_tabu; //set with before taken soluction
+mvd div_list; //map that  contain the best 200 solution. 
+svd div_tabu; //set with before taken solution.
 vd demand;
 vvd costs;
 vd best_sol;
@@ -51,7 +51,7 @@ db best_cost=1<<30;
 int main(){
  
   int best_it=0;
-  int max_it=1;
+  int max_it=1000;
   int i=0;
   int flag=1;
 
@@ -63,25 +63,26 @@ int main(){
   cout<<"init solution:"<<endl;
   print(s);
   cout<<endl<<"cost: "<<neighbor_cost(s)<<endl;
-  //cout<<"get_neighbor"<<endl;
-  //get_neighbor(1,best_it);
-  //cout<<endl<<"cost: "<<neighbor_cost(s)<<endl;   
+  
   while(i++ < max_it){
-    cout<<"iteration "<<i<<", div_list size: "<<div_list.size()<<endl;
+    db int_best_cost;
     if(div_list.size()>0){
       s = div_list.begin()->second;
       div_list.erase(div_list.begin());
     }
+    cout<<"iteration "<<i<<", div_list size: "<<div_list.size()<<" cost: "<<neighbor_cost(s)<<endl;
+    //print_map(div_list);
+    flag=1;
     while(flag){
-      get_neighbor(i,best_it,flag);
+      div_tabu.insert(s);
+      int_best_cost=neighbor_cost(s);
+      get_neighbor(i,best_it,flag,int_best_cost);
     }
-    //print(s);
   }
-  /*
+  
   cout<<"best solution in it="<<best_it<<endl;
   print(best_sol);
   cout<<"cost: "<<best_cost;
-  */
   return 0;
 }
 
@@ -97,13 +98,6 @@ int is_tabu_move(int x, int y, int pos_x, int pos_y){
         ((i.pos_x==pos_x && i.pos_y==pos_y) || (i.pos_x==pos_y && i.pos_y==pos_x))) return 1;
   }
   return 0;
-}
-
-void print_tabu_list(vt tabu_list){
-  cout<<"Tabu_list: (x,y) (pos_x,pos_y)"<<endl;
-  for(auto i : tabu_list){
-    cout<<"("<<i.x<<","<<i.y<<")("<<i.pos_x<<","<<i.pos_y<<")"<<endl;
-  }
 }
 //add 2 nodes to tabu list
 void add_tabu_nodes(int x, int y, int pos_x, int pos_y){
@@ -154,25 +148,27 @@ void exchange(int i, int j, vd &n){
   db tmp = n[i];
   n[i] = n[j];
   n[j] = tmp;
-  //cout<<"exchanging "<<i<<" "<<j<<endl;
 }
 
 //add neighbor to divesification list
 void add_to_div_list(vd n, db cost){
   if(!div_tabu.count(n)){
     if(!div_list.count(cost)){
-      div_list[cost]=n;
-      if(div_list.size()>div_list_size)div_list.erase(div_list.end());
+      if(div_list.size()>div_list_size)
+        div_list.erase(++div_list.rbegin().base());
+      else
+        div_list[cost]=n;
     }
   }
 }
 //generate all neighbors and evuale each of them
-void get_neighbor(int i, int &it){
+void get_neighbor(int i, int &it, int &flag,db &int_best_cost){
   db local_best_cost=1<<30;
   db x=0,y=0; //nodes involucrated in best neighbor
   int pos_x=0, pos_y=0; //dir of x and y
   vector<db>best_neighbor;
   
+  int l=1;
   for(db i=0; i<s.size(); i++){
     for(db j=0; j<s.size();j++){
       vector<db> tmp = s;
@@ -181,10 +177,10 @@ void get_neighbor(int i, int &it){
       if( a!=1 && b!=1  && b != 58 && a!=58 && a!=b){
         //insertion(i,j,a,tmp);
         exchange(i,j,tmp);
-        db tmp_cost = neighbor_cost(tmp);
-        
-        if(tmp_cost!=0)add_to_div_list(tmp,tmp_cost);
-        
+        db tmp_cost = neighbor_cost(tmp);        
+    
+        if(tmp_cost!=0) add_to_div_list(tmp,tmp_cost);
+    
         if(!is_tabu_move(a,b,i,j)){
           if(tmp_cost < local_best_cost && tmp_cost!=0){
             local_best_cost = tmp_cost;
@@ -206,21 +202,21 @@ void get_neighbor(int i, int &it){
     best_cost = local_best_cost;
     best_sol = best_neighbor;
     it = i;
-
+  }
+  if(local_best_cost < int_best_cost){
     s = best_neighbor;
     add_tabu_nodes(x,y,pos_x,pos_y);
-    cout<<"cost: "<<local_best_cost<<"nodes: ("<<x<<","<<y<<")("<<pos_x<<","<<pos_y<<")"<<endl;
-  }
-  //cout<<"best neighbor: "<<endl;
-  //print(best_neighbor);
+    cout<<"----> cost: "<<local_best_cost<<" nodes: ("<<x<<","<<y<<")("<<pos_x<<","<<pos_y<<")"<<endl;
+  }else {
+    flag=0;
+    cout<<"---->no tiene mejor vecino, local_best_cost: "<<local_best_cost<<endl;
+  };
+  
 }
-
-
-//load matriz of costs
+//load matrix with distaces data
 void load_costs(){
   fstream fs("costs",ios_base::in);
   string line;
-
   while(!getline(fs, line, '\n').eof()) {
     istringstream reader(line);
     vector<db> lineData;
@@ -236,15 +232,11 @@ void load_costs(){
   }
   cout<<"costs size: "<<costs[0].size()<<"X"<<costs.size()<<endl;
 }
-
-
 //read aproximated solution vector
 void read_init_sol(){
   fstream fs("init_sol", ios_base::in);
   db x;
-  while(fs >> x){
-    s.push_back(x);
-  }
+  while(fs >> x) s.push_back(x);
 }
 //load demand vector
 void load_demand(){
@@ -254,6 +246,12 @@ void load_demand(){
     demand.push_back(tmp);
   }
 }  
+
+/*
+//########################################
+//##### functions for debug algorithm #### 
+//########################################
+*/
 
 //print vector 
 void print(vd x){
@@ -270,5 +268,17 @@ void print_matriz(vvd &x){
       cout<<j<<" ";
     }
     cout<<endl;
+  }
+}
+void print_tabu_list(vt tabu_list){
+  cout<<"Tabu_list: (x,y) (pos_x,pos_y)"<<endl;
+  for(auto i : tabu_list){
+    cout<<"("<<i.x<<","<<i.y<<")("<<i.pos_x<<","<<i.pos_y<<")"<<endl;
+  }
+}
+//print map of posible solutions for diversification
+void print_map(mvd x){
+  for(auto i : x){
+    cout<<i.first<<endl;
   }
 }
