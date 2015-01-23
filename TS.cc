@@ -18,12 +18,14 @@ struct tabu{
   int y;
   int pos_y;
 };
+
 typedef double db;
 typedef vector<db> vd;
 typedef vector<vector<db> > vvd;
 typedef map<db,vd> mvd;
 typedef vector<tabu> vt;
 typedef set<vector<double> > svd;
+
 void aspiration();
 int is_tabu_move(int x, int y, int pos_x, int pos_y);
 void add_tabu_nodes(int x, int y, int pos_x, int posy);
@@ -39,44 +41,43 @@ void print(vd x);
 void print_matriz(vvd &x);
 void print_map(mvd);
 void print_tabu_list(vt tabu_list);
-vd s;
-vt tabu_list;
-mvd div_list; //map that  contain the best 200 solution. 
-svd div_tabu; //set with before taken solution.
-vd demand;
-vvd costs;
-vd best_sol;
-db best_cost=1<<30;
+
+vd s;                //local solution
+vt tabu_list;        //list of tabú movements
+mvd div_list;        //map that  contain the best 200 solution. 
+svd div_tabu;        //set with before taken solution.
+vd demand;           //vector of demand
+vvd costs;           //matrix of costs
+vd best_sol;         //global solution
+db best_cost=1<<30;  //global solution cost
 
 int main(){
  
   int best_it=0;
-  int max_it=1000;
+  int max_it=100000;
   int i=0;
   int flag=1;
 
-  read_init_sol();
+  read_init_sol();                       //load init solution           
   cout<<"sol.size: "<<s.size()<<endl;
-  load_costs();
-  load_demand();
+  load_costs();                          //load costs
+  load_demand();                         //load demand
   cout<<"demand.size: "<<demand.size()<<endl;
-  cout<<"init solution:"<<endl;
-  print(s);
-  cout<<endl<<"cost: "<<neighbor_cost(s)<<endl;
+  cout<<endl<<"init solution cost: "<<neighbor_cost(s)<<endl;
   
   while(i++ < max_it){
     db int_best_cost;
     if(div_list.size()>0){
-      s = div_list.begin()->second;
-      div_list.erase(div_list.begin());
+      s = div_list.begin()->second;      //get s' for diversification
+      div_list.erase(div_list.begin()); 
     }
-    cout<<"iteration "<<i<<", div_list size: "<<div_list.size()<<" cost: "<<neighbor_cost(s)<<endl;
+    //cout<<"iteration "<<i<<", div_list size: "<<div_list.size()<<" cost: "<<neighbor_cost(s)<<endl;
     //print_map(div_list);
     flag=1;
     while(flag){
-      div_tabu.insert(s);
-      int_best_cost=neighbor_cost(s);
-      get_neighbor(i,best_it,flag,int_best_cost);
+      div_tabu.insert(s);                          //set s' as tabu move
+      int_best_cost=neighbor_cost(s);              //get s' cost
+      get_neighbor(i,best_it,flag,int_best_cost);  //get best neighbor of s'
     }
   }
   
@@ -86,12 +87,13 @@ int main(){
   return 0;
 }
 
-//return 1 if tmp solution is accepted
+
+//return 1 if tmp_solution is better that best_solution
 int aspiration(db &best_cost, db &n_cost){
   if(n_cost < best_cost) return 1;
   return 0;
 }
-//return 1 if is tabu move otherwise return 0
+//eval move and return 1 if is tabu move otherwise return 0
 int is_tabu_move(int x, int y, int pos_x, int pos_y){
   for(auto i : tabu_list){
     if( ((i.x==x && i.y==y) || (i.x==y && i.y==x)) &&  
@@ -164,22 +166,23 @@ void add_to_div_list(vd n, db cost){
 //generate all neighbors and evuale each of them
 void get_neighbor(int i, int &it, int &flag,db &int_best_cost){
   db local_best_cost=1<<30;
-  db x=0,y=0; //nodes involucrated in best neighbor
-  int pos_x=0, pos_y=0; //dir of x and y
+  db x=0,y=0;                //nodes involucrated in best neighbor
+  int pos_x=0, pos_y=0;      //dir of x and y
   vector<db>best_neighbor;
   
   int l=1;
+
+  //exchange all positions evaluating and choosing best neigbor
   for(db i=0; i<s.size(); i++){
     for(db j=0; j<s.size();j++){
       vector<db> tmp = s;
       db a = tmp[i];
       db b = tmp[j];
       if( a!=1 && b!=1  && b != 58 && a!=58 && a!=b){
-        //insertion(i,j,a,tmp);
-        exchange(i,j,tmp);
-        db tmp_cost = neighbor_cost(tmp);        
+        exchange(i,j,tmp);                  //exchange positions
+        db tmp_cost = neighbor_cost(tmp);   //get cost of neighbor     
     
-        if(tmp_cost!=0) add_to_div_list(tmp,tmp_cost);
+        if(tmp_cost!=0) add_to_div_list(tmp,tmp_cost); //add posible solution to diversification list
     
         if(!is_tabu_move(a,b,i,j)){
           if(tmp_cost < local_best_cost && tmp_cost!=0){
@@ -206,10 +209,10 @@ void get_neighbor(int i, int &it, int &flag,db &int_best_cost){
   if(local_best_cost < int_best_cost){
     s = best_neighbor;
     add_tabu_nodes(x,y,pos_x,pos_y);
-    cout<<"----> cost: "<<local_best_cost<<" nodes: ("<<x<<","<<y<<")("<<pos_x<<","<<pos_y<<")"<<endl;
+    //cout<<"----> cost: "<<local_best_cost<<" nodes: ("<<x<<","<<y<<")("<<pos_x<<","<<pos_y<<")"<<endl;
   }else {
     flag=0;
-    cout<<"---->no tiene mejor vecino, local_best_cost: "<<local_best_cost<<endl;
+    //cout<<"---->no tiene mejor vecino, local_best_cost: "<<local_best_cost<<endl;
   };
   
 }
@@ -234,13 +237,13 @@ void load_costs(){
 }
 //read aproximated solution vector
 void read_init_sol(){
-  fstream fs("init_sol", ios_base::in);
+  fstream fs("init_sol1", ios_base::in);
   db x;
   while(fs >> x) s.push_back(x);
 }
 //load demand vector
 void load_demand(){
-  fstream fs("demand", ios_base::in);
+  fstream fs("demand1", ios_base::in);
   db tmp;
   while(fs >> tmp){
     demand.push_back(tmp);
