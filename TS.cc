@@ -1,6 +1,6 @@
 /*
  * ivanchoff@gmail.com
- *
+ * tabu_search
  */
 
 #include<bits/stdc++.h>
@@ -54,16 +54,16 @@ db best_cost=1<<30;  //global solution cost
 int main(){
  
   int best_it=0;
-  int max_it=100000;
+  int max_it=100;
   int i=0;
   int flag=1;
 
   read_init_sol();                       //load init solution           
-  cout<<"sol.size: "<<s.size()<<endl;
+  //cout<<"sol.size: "<<s.size()<<endl;
   load_costs();                          //load costs
   load_demand();                         //load demand
-  cout<<"demand.size: "<<demand.size()<<endl;
-  cout<<endl<<"init solution cost: "<<neighbor_cost(s)<<endl;
+  //cout<<"demand.size: "<<demand.size()<<endl;
+  //cout<<endl<<"init solution cost: "<<neighbor_cost(s)<<endl;
   
   while(i++ < max_it){
     db int_best_cost;
@@ -71,7 +71,7 @@ int main(){
       s = div_list.begin()->second;      //get s' for diversification
       div_list.erase(div_list.begin()); 
     }
-    //cout<<"iteration "<<i<<", div_list size: "<<div_list.size()<<" cost: "<<neighbor_cost(s)<<endl;
+    //cout<<"iteration "<<i<<"  cost: "<<neighbor_cost(s)<<endl;
     //print_map(div_list);
     flag=1;
     while(flag){
@@ -81,9 +81,9 @@ int main(){
     }
   }
   
-  cout<<"best solution in it="<<best_it<<endl;
+  //cout<<"best solution in it="<<best_it<<endl;
   print(best_sol);
-  cout<<"cost: "<<best_cost;
+  //cout<<"cost: "<<best_cost;
   return 0;
 }
 
@@ -233,7 +233,7 @@ void load_costs(){
     }
     costs.push_back(lineData);
   }
-  cout<<"costs size: "<<costs[0].size()<<"X"<<costs.size()<<endl;
+  //cout<<"costs size: "<<costs[0].size()<<"X"<<costs.size()<<endl;
 }
 //read aproximated solution vector
 void read_init_sol(){
