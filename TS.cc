@@ -44,7 +44,7 @@ void print_tabu_list(vt tabu_list);
 
 vd s;                //local solution
 vt tabu_list;        //list of tabú movements
-mvd div_list;        //map that  contain the best 200 solution. 
+mvd div_list;        //map that  contain the best 200 solution.
 svd div_tabu;        //set with before taken solution.
 vd demand;           //vector of demand
 vvd costs;           //matrix of costs
@@ -52,24 +52,24 @@ vd best_sol;         //global solution
 db best_cost=1<<30;  //global solution cost
 
 int main(){
- 
+
   int best_it=0;
   int max_it=100;
   int i=0;
   int flag=1;
 
-  read_init_sol();                       //load init solution           
+  read_init_sol();                       //load init solution
   //cout<<"sol.size: "<<s.size()<<endl;
   load_costs();                          //load costs
   load_demand();                         //load demand
   //cout<<"demand.size: "<<demand.size()<<endl;
   //cout<<endl<<"init solution cost: "<<neighbor_cost(s)<<endl;
-  
+
   while(i++ < max_it){
     db int_best_cost;
     if(div_list.size()>0){
       s = div_list.begin()->second;      //get s' for diversification
-      div_list.erase(div_list.begin()); 
+      div_list.erase(div_list.begin());
     }
     //cout<<"iteration "<<i<<"  cost: "<<neighbor_cost(s)<<endl;
     //print_map(div_list);
@@ -80,7 +80,7 @@ int main(){
       get_neighbor(i,best_it,flag,int_best_cost);  //get best neighbor of s'
     }
   }
-  
+
   //cout<<"best solution in it="<<best_it<<endl;
   print(best_sol);
   //cout<<"cost: "<<best_cost;
@@ -96,7 +96,7 @@ int aspiration(db &best_cost, db &n_cost){
 //eval move and return 1 if is tabu move otherwise return 0
 int is_tabu_move(int x, int y, int pos_x, int pos_y){
   for(auto i : tabu_list){
-    if( ((i.x==x && i.y==y) || (i.x==y && i.y==x)) &&  
+    if( ((i.x==x && i.y==y) || (i.x==y && i.y==x)) &&
         ((i.pos_x==pos_x && i.pos_y==pos_y) || (i.pos_x==pos_y && i.pos_y==pos_x))) return 1;
   }
   return 0;
@@ -120,7 +120,7 @@ void add_tabu_nodes(int x, int y, int pos_x, int pos_y){
 db neighbor_cost(vd n){
   db carga = 0;
   db costo = 0;
-  
+
   for(db i=0; i<n.size(); i++){
     int to = n[i];
     if(carga > Q){
@@ -135,9 +135,9 @@ db neighbor_cost(vd n){
       carga += demand[to-1];
       costo += costs[from-1][to-1];
       //cout<<"from: "<<from<<" to:"<<to<<" demanda: "<<demand[to-1]<<" costo:"<< costs[from-1][to-1]<<endl;
-      } 
+      }
   }
-  return costo;  
+  return costo;
 }
 
 //insertion operator for neighbor selection
@@ -169,7 +169,6 @@ void get_neighbor(int i, int &it, int &flag,db &int_best_cost){
   db x=0,y=0;                //nodes involucrated in best neighbor
   int pos_x=0, pos_y=0;      //dir of x and y
   vector<db>best_neighbor;
-  
   int l=1;
 
   //exchange all positions evaluating and choosing best neigbor
@@ -180,10 +179,10 @@ void get_neighbor(int i, int &it, int &flag,db &int_best_cost){
       db b = tmp[j];
       if( a!=1 && b!=1  && b != 58 && a!=58 && a!=b){
         exchange(i,j,tmp);                  //exchange positions
-        db tmp_cost = neighbor_cost(tmp);   //get cost of neighbor     
-    
+        db tmp_cost = neighbor_cost(tmp);   //get cost of neighbor
+
         if(tmp_cost!=0) add_to_div_list(tmp,tmp_cost); //add posible solution to diversification list
-    
+
         if(!is_tabu_move(a,b,i,j)){
           if(tmp_cost < local_best_cost && tmp_cost!=0){
             local_best_cost = tmp_cost;
@@ -214,7 +213,7 @@ void get_neighbor(int i, int &it, int &flag,db &int_best_cost){
     flag=0;
     //cout<<"---->no tiene mejor vecino, local_best_cost: "<<local_best_cost<<endl;
   };
-  
+
 }
 //load matrix with distaces data
 void load_costs(){
@@ -248,15 +247,15 @@ void load_demand(){
   while(fs >> tmp){
     demand.push_back(tmp);
   }
-}  
+}
 
 /*
 //########################################
-//##### functions for debug algorithm #### 
+//##### functions for debug algorithm ####
 //########################################
 */
 
-//print vector 
+//print vector
 void print(vd x){
   for(auto i : x){
     cout<<i<<" ";
