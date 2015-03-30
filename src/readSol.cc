@@ -27,8 +27,8 @@ int main(){
   vd sol;          //solucion tabu
   vd demand;       //vector de demanda
 
-  int k=0,q=0,time=0,cost; 
-  
+  int k=0,q=0,time=0,cost;
+
   load_costs(costs);
   read_tabu_sol(sol);
   cout<<"tabu sol size: "<<sol.size()<<endl;
@@ -46,7 +46,7 @@ int main(){
       time += time_costs[tmp][sol[i-1]];
       if(tmp!=final_node){
         q += demand[i];
-        
+
       }else{
         cout<<"Carro: "<<k<<"  Carga: "<<q<<"  Time: "<<time<<endl;
       }
@@ -76,18 +76,18 @@ void load_costs(vvd &costs){
 }
 //read aproximated solution vector
 void read_tabu_sol(vd &s){
-  fstream fs("init_sol1", ios_base::in);
+  fstream fs("readSol_input", ios_base::in);
   db x;
   while(fs >> x) s.push_back(x);
 }
 //load demand vector
 void load_demand(vd &demand){
-  fstream fs("demand1", ios_base::in);
+  fstream fs("demand", ios_base::in);
   db tmp;
   while(fs >> tmp){
     demand.push_back(tmp);
   }
-}  
+}
 //load matrix with time data
 void load_time(vvd &time_costs){
   fstream fs("tiempos.txt",ios_base::in);
@@ -124,7 +124,7 @@ db calc_cost(vd n, vd demand, vvd costs){
       int from = n[i-1];
       carga += demand[to-1];
       costo += costs[from-1][to-1];
-    } 
+    }
   }
-  return costo;  
+  return costo;
 }

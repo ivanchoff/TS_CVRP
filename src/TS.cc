@@ -1,5 +1,5 @@
 /*
- * ivanchoff@gmail.com
+ * choff@riseup.net
  * tabu_search
  */
 
@@ -236,13 +236,13 @@ void load_costs(){
 }
 //read aproximated solution vector
 void read_init_sol(){
-  fstream fs("init_sol1", ios_base::in);
+  fstream fs("TS_init_sol_input", ios_base::in);
   db x;
   while(fs >> x) s.push_back(x);
 }
 //load demand vector
 void load_demand(){
-  fstream fs("demand1", ios_base::in);
+  fstream fs("demand", ios_base::in);
   db tmp;
   while(fs >> tmp){
     demand.push_back(tmp);
