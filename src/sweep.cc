@@ -1,4 +1,4 @@
-// choff@riseup.net
+OB// choff@riseup.net
 
 #include<bits/stdc++.h>
 
@@ -17,7 +17,7 @@ using namespace std;
 #define VVd vector<vector<double> >
 #define Q 22000    //capacity of car
 #define k 8        //# of cars
-#define init_node -1
+#define init_node 1
 #define end_node 58
 
 void printVVd(VVd &x){
