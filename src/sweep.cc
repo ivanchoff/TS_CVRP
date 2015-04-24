@@ -1,4 +1,4 @@
-OB// choff@riseup.net
+// choff@riseup.net
 
 #include<bits/stdc++.h>
 
