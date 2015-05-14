@@ -1,0 +1,12 @@
+costs size: 58X58
+tabu sol size: 70
+time costs size: 60X60
+demand size: 58
+Carro: 1  Carga: 20632  Time: 3699
+Carro: 2  Carga: 21217  Time: 3662
+Carro: 3  Carga: 20940  Time: 5848
+Carro: 4  Carga: 19888  Time: 4388
+Carro: 5  Carga: 20417  Time: 4564
+Carro: 6  Carga: 5529  Time: 6123
+Carro: 7  Carga: 756  Time: 1293
+Costo total: 138755

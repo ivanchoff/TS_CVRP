@@ -5,6 +5,7 @@ This repos contain some programs for solve **CVRP** (Capacitated Vehicle Routing
 - [Sweep algorithm](#sweep.cc)
 - [Tabu Search](#TS.cc)
 - [View solution](#readSol.cc)
+- [Test example](#runing example)
 
 #sweep.cc
 ![sweep algorithm](http://w1.cirrelt.ca/~vidalt/en/VRPExample.png)
@@ -92,3 +93,7 @@ for run
 ```bash
 ./readSol < readSol_input
 ```
+
+#runing example
+
+for runing example execute **run.sh** in a terminal.
